@@ -45,23 +45,23 @@ add_executable(base-station-rp2040 ${SOURCES})
 pico_set_program_name(base-station-rp2040 "base-station-rp2040")
 pico_set_program_version(base-station-rp2040 "0.1")
 
-# Modify the below lines to enable/disable output over UART/USB
-pico_enable_stdio_uart(base-station-rp2040 0)
-pico_enable_stdio_usb(base-station-rp2040 1)
+# Add the standard include files to the build
+target_include_directories(base-station-rp2040 PUBLIC
+    ${CMAKE_CURRENT_LIST_DIR}/src
+)
 
 # Add the standard library to the build
 target_link_libraries(base-station-rp2040
-        pico_stdlib)
-
-# Add the standard include files to the build
-target_include_directories(base-station-rp2040 PRIVATE
-        ${CMAKE_CURRENT_LIST_DIR}
+    pico_stdlib
+    tinyusb_device
+    tinyusb_board
 )
 
 # Add any user requested libraries
 target_link_libraries(base-station-rp2040 
-        hardware_spi
-        )
+    hardware_spi
+)
 
+pico_enable_stdio_usb(base-station-rp2040 1)
 pico_add_extra_outputs(base-station-rp2040)
 
