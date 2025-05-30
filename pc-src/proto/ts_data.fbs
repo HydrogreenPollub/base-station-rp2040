@@ -1,0 +1,40 @@
+
+enum FuelCellMode: byte {noneSelected, off, prepareToRace, race}
+
+struct TSData {
+    isEmergency:bool;
+    isEmergencyButtonPressed:bool;
+    isEmergencySwitchToggled:bool;
+    isHydrogenLeaking:bool;
+    isScRelayClosed:bool;
+    isTimeResetButtonPressed:bool;
+    isHalfSpeedButtonPressed:bool;
+    isGasButtonPressed:bool;
+    fuelCellMode:FuelCellMode;
+
+    fcCurrent:float32;
+    fcScCurrent:float32;
+    scMotorCurrent:float32;
+    fcVoltage:float32;
+    scVoltage:float32;
+    hydrogenSensorVoltage:float32;
+    fuelCellTemperature:float32;
+    fanRpm:int32;
+    vehicleSpeed:float32;
+    motorPwm:int32;
+    hydrogenPressure:float32;
+
+    gpsLatitude:float32;
+    gpsLongitude:float32;
+    gpsAltitude:float32;
+    gpsSpeed:float32;
+
+    motorSpeed:float32;
+    motorCurrent:float32;
+    fcCurrentRaw:float32;
+    fcVoltageRaw:float32;
+    mcCurrent:float32;
+
+    lapNumber :uint8;
+
+}

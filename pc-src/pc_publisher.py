@@ -1,32 +1,29 @@
-import flatbuffers
-import TSData
-
-import capnp
-import ts_data_capnp
-
-import time
-import paho.mqtt.client as mqtt
-
-import serial
-
-from tempfile import SpooledTemporaryFile
-capnp.remove_import_hook()
-
 import os
+import serial
+import paho.mqtt.client as mqtt
 from dotenv import load_dotenv
 
+import capnp
+from tempfile import SpooledTemporaryFile
+
 load_dotenv()
+capnp.remove_import_hook()
+ts_data_capnp = capnp.load('proto/ts_data.capnp')
 
 new_client = []
 
 ser = serial.Serial(
-    port = os.getenv("SERIAL_PORT"),
+    port = input("Select serial port: "),
     baudrate = int(os.getenv("SERIAL_BAUDRATE")),
     parity = serial.PARITY_NONE,
     stopbits = serial.STOPBITS_ONE,
     bytesize = serial.EIGHTBITS,
-    timeout = 5
+    timeout = 10
 )
+
+print("SERIAL_PORT", os.getenv("SERIAL_PORT"))
+print("SERIAL_BAUDRATE", os.getenv("SERIAL_BAUDRATE"))
+print("MQTT_TOPIC", os.getenv("MQTT_TOPIC"))
 
 has_found_start = False
 
@@ -55,11 +52,13 @@ def on_tick():
             return
 
     buffer = ser.read(128)
+    new_client.publish(os.getenv("MQTT_TOPIC"), buffer)
 
     print(" ")
-    print("=== Message sent (%d bytes) ===" % len(buffer))
+    print("=== Message received and sent (%d bytes) ===" % len(buffer))
     print(buffer.hex(sep=' '))
 
+    # DEBUG: check content
     f = SpooledTemporaryFile(256, 'wb+')
     f.write(buffer)
     f.seek(0)
@@ -67,25 +66,18 @@ def on_tick():
     data = data.to_dict()
     print(data)
 
-    new_client.publish(os.getenv("MQTT_TOPIC"), buffer)
-
     has_found_start = False
 
 
 if __name__ == '__main__':
     # Create an MQTT client
-    new_client = mqtt.Client()
+    new_client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
 
     # Set the username and password for authentication
     new_client.username_pw_set(username=os.getenv("BROKER_USERNAME"), password=os.getenv("BROKER_PASSWORD"))
     
     # Connect to the broker
-    new_client.connect(os.getenv("BROKER_ADDRESS"), port=os.getenv("BROKER_PORT"))
-    
-    # Start the loop to receive messages
-    #new_client.loop_forever()
+    new_client.connect(os.getenv("BROKER_ADDRESS"), port=int(os.getenv("BROKER_PORT")))
 
-    while (True):
+    while True:
         on_tick()
-
-    ser.close()
