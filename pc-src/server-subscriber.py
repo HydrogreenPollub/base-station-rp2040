@@ -27,6 +27,8 @@ username = os.getenv("BROKER_USERNAME")
 password = os.getenv("BROKER_PASSWORD")
 topic = "sensors"
 
+FRAME_SIZE = 144
+
 def to_snake_case(name):
     """Converts a CamelCase string to snake_case."""
     s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
@@ -43,18 +45,9 @@ def on_message(client, userdata, msg):
     print(f"=== Message received - {len(buffer)} bytes - {get_curr_timestamp()} (UTC) ===")
     print(buffer.hex(sep=' '))
 
-    required_bytes = 128
-
-    if len(buffer) != required_bytes:
-        print(f"Required value not reached: frame save aborted (bytes: {len(buffer)}/{required_bytes})")
+    if len(buffer) != FRAME_SIZE:
+        print(f"Required value not reached: frame save aborted (bytes: {len(buffer)}/{FRAME_SIZE})")
         return
-
-    # Check message parsing via Flatbuffers
-    try:
-        ts_data_flatbuffers = TSData.TSData.GetRootAs(buffer)
-        print(f"[Data check - FlatBuffers] Latitude: {ts_data_flatbuffers.GpsLatitude()}, Longitude: {ts_data_flatbuffers.GpsLongitude()}")
-    except Exception as err:
-        print("Flatbuffers conversion did not succeed: ", err)
 
     # Check message parsing via Capnp
     try:
@@ -69,29 +62,12 @@ def on_message(client, userdata, msg):
         print("Capnp conversion did not succeed: ", err)
         return
 
-    # TODO use dynamic column names retrieval in future (values, column_names_str variables)
-    snake_case_data = {to_snake_case(key): value for key, value in ts_data.items()}
-    snake_case_data["time"] = time.time() # received time
+    # TODO Add custom columns to dictionary or remove unwanted here
+    ts_data["time"] = time.time_ns() # received time
 
-    column_names_str = ", ".join(snake_case_data) # TODO use
-    placeholders_str = ", ".join(["%s"] * len(snake_case_data)) # Todo use
-
-    # column_names = [
-    #     "time", "vehicle_type", "fc_voltage", "fc_current", "fc_temperature", "sc_motor_voltage", "sc_current",
-    #     "motor_current", "motor_speed", "motor_pwm", "vehicle_speed", "h2_pressure", "h2_leak_level", "fan_rpm",
-    #     "gps_latitude", "gps_longitude", "gps_altitude", "gps_speed", "lap_number"
-    # ] # TODO remove
-    # column_names_str = ', '.join(column_names) # TODO remove
-    # placeholders_str = ", ".join(["%s"] * len(column_names)) # TODO remove
-
-    values = [snake_case_data[key] for key in column_names_str] # TODO use
-
-    # values = tuple([
-    #     time.time_ns(), '0', ts_data["fcVoltage"], ts_data["fcCurrent"], ts_data["fuelCellTemperature"], ts_data["scVoltage"],
-    #     ts_data["fcScCurrent"], ts_data["motorCurrent"], ts_data["motorSpeed"], ts_data["motorPwm"], ts_data["vehicleSpeed"],
-    #     ts_data["hydrogenPressure"], '2', ts_data["fanRpm"], ts_data["gpsLatitude"], ts_data["gpsLongitude"],
-    #     ts_data["gpsAltitude"], ts_data["gpsSpeed"], ts_data["lapNumber"]
-    # ]) # TODO remove
+    column_names_str = '"' +  '", "'.join(ts_data) + '"'
+    placeholders_str = ", ".join(["%s"] * len(ts_data))
+    values = tuple(ts_data.values())
 
     query = (
         f"INSERT INTO measurements ({column_names_str}) "

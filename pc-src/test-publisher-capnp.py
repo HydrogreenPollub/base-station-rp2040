@@ -14,21 +14,23 @@ print("MQTT_TOPIC", os.getenv("MQTT_TOPIC"))
 
 new_client = []
 
+FRAME_LENGTH = 144
+
 def on_tick():
     f = SpooledTemporaryFile(1024, 'wb+')
     ts_data = ts_data_capnp.TSData.new_message()
-    ts_data.fuelCellVoltage = 2137
+    ts_data.fuelCellOutputVoltage = 2137
     ts_data.gpsLatitude = 52.111
     ts_data.write(f)
     f.seek(0)
 
-    buffer = bytearray(f.read(128))
-    buffer += bytearray(128 - len(buffer)) # Fill missing zeros
+    buffer = bytearray(f.read(512))
+    buffer += bytearray(FRAME_LENGTH - len(buffer)) # Fill missing zeros
 
     new_client.publish(os.getenv("MQTT_TOPIC"), buffer)
 
     print(" ")
-    print("=== Message sent (%d bytes) ===" % len(buffer))
+    print(f"=== Message sent (frame len: {FRAME_LENGTH}, buffer len: {len(buffer)}) ===")
     print(buffer.hex(sep=' '))
 
 if __name__ == '__main__':

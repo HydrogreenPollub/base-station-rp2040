@@ -25,6 +25,7 @@ print("SERIAL_PORT", os.getenv("SERIAL_PORT"))
 print("SERIAL_BAUDRATE", os.getenv("SERIAL_BAUDRATE"))
 print("MQTT_TOPIC", os.getenv("MQTT_TOPIC"))
 
+FRAME_LENGTH = 144
 has_found_start = False
 
 def on_tick():
@@ -51,7 +52,7 @@ def on_tick():
         else:
             return
 
-    buffer = ser.read(128)
+    buffer = ser.read(FRAME_LENGTH)
     new_client.publish(os.getenv("MQTT_TOPIC"), buffer)
 
     print(" ")
