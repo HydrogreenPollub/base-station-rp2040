@@ -87,7 +87,7 @@ def on_message(client, userdata, msg):
     #values = [snake_case_data[key] for key in column_names_str] # TODO use
 
     values = tuple([
-        time.time(), '0', ts_data["fcVoltage"], ts_data["fcCurrent"], ts_data["fuelCellTemperature"], ts_data["scVoltage"],
+        time.time_ns(), '0', ts_data["fcVoltage"], ts_data["fcCurrent"], ts_data["fuelCellTemperature"], ts_data["scVoltage"],
         ts_data["fcScCurrent"], ts_data["motorCurrent"], ts_data["motorSpeed"], ts_data["motorPwm"], ts_data["vehicleSpeed"],
         ts_data["hydrogenPressure"], '2', ts_data["fanRpm"], ts_data["gpsLatitude"], ts_data["gpsLongitude"],
         ts_data["gpsAltitude"], ts_data["gpsSpeed"], ts_data["lapNumber"]
@@ -115,6 +115,10 @@ if __name__ == '__main__':
         print(f'DB_DATABASE: {os.getenv("DB_DATABASE")}')
         print(f'DB_HOST: {os.getenv("DB_HOST")}')
         print(f'DB_PORT: {os.getenv("DB_PORT")}')
+
+        obj = time.gmtime(0)
+        epoch = time.asctime(obj)
+        print("Time epoch (time start):", epoch)
 
         conn = psycopg2.connect(
             dbname=os.getenv("DB_DATABASE"),
