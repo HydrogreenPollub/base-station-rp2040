@@ -17,7 +17,7 @@ new_client = []
 def on_tick():
     f = SpooledTemporaryFile(1024, 'wb+')
     ts_data = ts_data_capnp.TSData.new_message()
-    ts_data.fcVoltage = 2137
+    ts_data.fuelCellVoltage = 2137
     ts_data.gpsLatitude = 52.111
     ts_data.write(f)
     f.seek(0)

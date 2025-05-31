@@ -13,7 +13,7 @@ ts_data_capnp = capnp.load('proto/ts_data.capnp')
 new_client = []
 
 ser = serial.Serial(
-    port = input("Select serial port: "),
+    port = input(f"Select serial port (default: {os.getenv("SERIAL_PORT")}): ") or os.getenv("SERIAL_PORT"),
     baudrate = int(os.getenv("SERIAL_BAUDRATE")),
     parity = serial.PARITY_NONE,
     stopbits = serial.STOPBITS_ONE,

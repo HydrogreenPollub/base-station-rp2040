@@ -76,22 +76,22 @@ def on_message(client, userdata, msg):
     column_names_str = ", ".join(snake_case_data) # TODO use
     placeholders_str = ", ".join(["%s"] * len(snake_case_data)) # Todo use
 
-    column_names = [
-        "time", "vehicle_type", "fc_voltage", "fc_current", "fc_temperature", "sc_motor_voltage", "sc_current",
-        "motor_current", "motor_speed", "motor_pwm", "vehicle_speed", "h2_pressure", "h2_leak_level", "fan_rpm",
-        "gps_latitude", "gps_longitude", "gps_altitude", "gps_speed", "lap_number"
-    ] # TODO remove
-    column_names_str = ', '.join(column_names) # TODO remove
-    placeholders_str = ", ".join(["%s"] * len(column_names)) # TODO remove
+    # column_names = [
+    #     "time", "vehicle_type", "fc_voltage", "fc_current", "fc_temperature", "sc_motor_voltage", "sc_current",
+    #     "motor_current", "motor_speed", "motor_pwm", "vehicle_speed", "h2_pressure", "h2_leak_level", "fan_rpm",
+    #     "gps_latitude", "gps_longitude", "gps_altitude", "gps_speed", "lap_number"
+    # ] # TODO remove
+    # column_names_str = ', '.join(column_names) # TODO remove
+    # placeholders_str = ", ".join(["%s"] * len(column_names)) # TODO remove
 
-    #values = [snake_case_data[key] for key in column_names_str] # TODO use
+    values = [snake_case_data[key] for key in column_names_str] # TODO use
 
-    values = tuple([
-        time.time_ns(), '0', ts_data["fcVoltage"], ts_data["fcCurrent"], ts_data["fuelCellTemperature"], ts_data["scVoltage"],
-        ts_data["fcScCurrent"], ts_data["motorCurrent"], ts_data["motorSpeed"], ts_data["motorPwm"], ts_data["vehicleSpeed"],
-        ts_data["hydrogenPressure"], '2', ts_data["fanRpm"], ts_data["gpsLatitude"], ts_data["gpsLongitude"],
-        ts_data["gpsAltitude"], ts_data["gpsSpeed"], ts_data["lapNumber"]
-    ]) # TODO remove
+    # values = tuple([
+    #     time.time_ns(), '0', ts_data["fcVoltage"], ts_data["fcCurrent"], ts_data["fuelCellTemperature"], ts_data["scVoltage"],
+    #     ts_data["fcScCurrent"], ts_data["motorCurrent"], ts_data["motorSpeed"], ts_data["motorPwm"], ts_data["vehicleSpeed"],
+    #     ts_data["hydrogenPressure"], '2', ts_data["fanRpm"], ts_data["gpsLatitude"], ts_data["gpsLongitude"],
+    #     ts_data["gpsAltitude"], ts_data["gpsSpeed"], ts_data["lapNumber"]
+    # ]) # TODO remove
 
     query = (
         f"INSERT INTO measurements ({column_names_str}) "
