@@ -11,9 +11,10 @@ capnp.remove_import_hook()
 ts_data_capnp = capnp.load('proto/ts_data.capnp')
 
 new_client = []
+serial_port = input(f"Select serial port (default: {os.getenv("SERIAL_PORT")}): ") or os.getenv("SERIAL_PORT")
 
 ser = serial.Serial(
-    port = input(f"Select serial port (default: {os.getenv("SERIAL_PORT")}): ") or os.getenv("SERIAL_PORT"),
+    port = serial_port,
     baudrate = int(os.getenv("SERIAL_BAUDRATE")),
     parity = serial.PARITY_NONE,
     stopbits = serial.STOPBITS_ONE,
@@ -21,11 +22,11 @@ ser = serial.Serial(
     timeout = 10
 )
 
-print("SERIAL_PORT", os.getenv("SERIAL_PORT"))
+print("SERIAL_PORT", serial_port)
 print("SERIAL_BAUDRATE", os.getenv("SERIAL_BAUDRATE"))
 print("MQTT_TOPIC", os.getenv("MQTT_TOPIC"))
 
-FRAME_LENGTH = 144
+FRAME_LENGTH = 160
 has_found_start = False
 
 def on_tick():

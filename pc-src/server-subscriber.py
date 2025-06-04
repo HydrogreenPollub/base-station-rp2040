@@ -27,7 +27,7 @@ username = os.getenv("BROKER_USERNAME")
 password = os.getenv("BROKER_PASSWORD")
 topic = "sensors"
 
-FRAME_SIZE = 144
+FRAME_SIZE = 160
 
 def to_snake_case(name):
     """Converts a CamelCase string to snake_case."""
